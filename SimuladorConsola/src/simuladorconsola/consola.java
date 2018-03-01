@@ -9,7 +9,9 @@ import java.awt.event.KeyEvent;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.Position;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -19,11 +21,14 @@ import javax.swing.tree.TreeSelectionModel;
  */
 public class consola extends javax.swing.JFrame {
 
-    /**
-     * Creates new form consola
-     */
+    DefaultTreeModel model;
+    TreePath path = null;
+    String pathTemporal = "root/";
+    String pathGlobal = "root/";
+
     public consola() {
         initComponents();
+        model = (DefaultTreeModel) filesTree.getModel();
     }
 
     @SuppressWarnings("unchecked")
@@ -39,6 +44,28 @@ public class consola extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Console");
 
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
+        javax.swing.tree.DefaultMutableTreeNode treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("home");
+        javax.swing.tree.DefaultMutableTreeNode treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("lib");
+        treeNode2.add(treeNode3);
+        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("media");
+        treeNode2.add(treeNode3);
+        treeNode1.add(treeNode2);
+        treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("angel");
+        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("Documentos");
+        javax.swing.tree.DefaultMutableTreeNode treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("lista.txt");
+        treeNode3.add(treeNode4);
+        treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("imagen.png");
+        treeNode3.add(treeNode4);
+        treeNode2.add(treeNode3);
+        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("Descargas");
+        treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("fondoPantalla");
+        treeNode3.add(treeNode4);
+        treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("archivo.rar");
+        treeNode3.add(treeNode4);
+        treeNode2.add(treeNode3);
+        treeNode1.add(treeNode2);
+        filesTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         filesTree.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 filesTreeMouseClicked(evt);
@@ -96,15 +123,14 @@ public class consola extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    DefaultMutableTreeNode nod = null;
     private void filesTreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_filesTreeMouseClicked
 
-        TreeSelectionModel smd = filesTree.getSelectionModel();
-        if (smd.getSelectionCount() > 0) {
-            TreePath selectedNode = filesTree.getSelectionPath();
-            consoleTextArea.setText(selectedNode.toString().replaceAll("\\[", "/").replaceAll("\\]", "").replaceAll(",", "/").replaceAll(" ", ""));
-        }
-
+//        TreeSelectionModel smd = filesTree.getSelectionModel();
+//        if (smd.getSelectionCount() > 0) {
+//            TreePath selectedNode = filesTree.getSelectionPath();
+//            consoleTextArea.setText(selectedNode.toString().replaceAll("\\[", "/").replaceAll("\\]", "").replaceAll(",", "/").replaceAll(" ", ""));
+//        }
     }//GEN-LAST:event_filesTreeMouseClicked
 
     private void myComandsFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_myComandsFocusLost
@@ -125,7 +151,7 @@ public class consola extends javax.swing.JFrame {
 
     private void consoleTextAreaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_consoleTextAreaKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            AnalizadorLexico miLexer = new AnalizadorLexico(new StringReader(myComands.getText()));
+            AnalizadorLexico miLexer = new AnalizadorLexico(new StringReader(obtenerUltimaLinea(consoleTextArea.getText())));
             parser miParser = new parser(miLexer);
             try {
                 miParser.parse();
@@ -142,4 +168,154 @@ public class consola extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField myComands;
     // End of variables declaration//GEN-END:variables
+
+    private String obtenerUltimaLinea(String textoEntrada) {
+        int catENTER = 1;
+        String textoSelect = "";
+        String textoSalida = "";
+        for (int i = (textoEntrada.length() - 1); i > -1; i--) {
+            char letra = textoEntrada.charAt(i);
+            if (catENTER > 0) {
+                switch (letra) {
+                    case '\r':
+                    case '\n':
+                        catENTER--;
+                        break;
+                    default:
+                        textoSelect += letra;
+                }
+            }
+
+        }
+
+//        System.out.println(textoSelect);
+        for (int i = (textoSelect.length() - 1); i > -1; i--) {
+            char letra = textoSelect.charAt(i);
+            textoSalida += letra;
+
+        }
+//        System.err.println(textoSalida);
+        return textoSalida;
+    }
+
+    public boolean findText(String nodes) {
+        String[] parts = nodes.split("/");
+        for (String part : parts) {
+            int row = (path == null ? 0 : filesTree.getRowForPath(path));
+            path = filesTree.getNextMatch(part, row, Position.Bias.Forward);
+            if (path == null) {
+                return false;
+            }
+        }
+        filesTree.scrollPathToVisible(path);
+        filesTree.setSelectionPath(path);
+        return path != null;
+    }
+
+    public String obtenerNuevoPathConRoot(String textoEntrada) {
+        String texAux = "";
+
+        for (int i = 0; i < textoEntrada.length(); i++) {
+            char letra = textoEntrada.charAt(i);
+            if (textoEntrada.charAt(0) == '/' && i == 0) {
+                texAux = "root/";
+            } else {
+                texAux += letra;
+            }
+        }
+        System.out.println("Path modificado: " + texAux);
+        return texAux;
+    }
+
+    public String nameFileoDir(String textoEntrada) {
+        int catENTER = 1;
+        String textoSelect = "";
+        String textoSalida = "";
+        for (int i = (textoEntrada.length() - 1); i > -1; i--) {
+            char letra = textoEntrada.charAt(i);
+            if (catENTER > 0) {
+                switch (letra) {
+                    case '/':
+                        catENTER--;
+                        break;
+                    default:
+                        textoSelect += letra;
+                }
+            }
+        }
+        for (int i = (textoSelect.length() - 1); i > -1; i--) {
+            char letra = textoSelect.charAt(i);
+            textoSalida += letra;
+        }
+        return textoSalida;
+    }
+
+    public String eliminarNameDirFile(String textoEntrada) {
+        int catENTER = 1;
+        String textoSelect = "";
+        String textoSalida = "";
+        for (int i = (textoEntrada.length() - 1); i > -1; i--) {
+            char letra = textoEntrada.charAt(i);
+            if (catENTER > 0) {
+                switch (letra) {
+                    case '/':
+                        catENTER--;
+                        break;
+                }
+            } else {
+                textoSelect += letra;
+            }
+        }
+        for (int i = (textoSelect.length() - 1); i > -1; i--) {
+            char letra = textoSelect.charAt(i);
+            textoSalida += letra;
+        }
+        return textoSalida;
+    }
+
+    public void addFile(String pathToAdd) {
+        pathTemporal = eliminarNameDirFile(obtenerNuevoPathConRoot(pathToAdd));
+        String nameFile = nameFileoDir(pathToAdd);
+
+        if (findText(pathTemporal)) {
+            nod = (DefaultMutableTreeNode) filesTree.getLastSelectedPathComponent();
+            System.out.println("Last path: " + filesTree.getLastSelectedPathComponent().toString());
+
+            if (nod != null) {
+                if (!nod.isLeaf()) {
+                    nod.insert(new DefaultMutableTreeNode(nameFile), nod.getIndex(nod.getLastChild()));
+                } else {
+                    nod.insert(new DefaultMutableTreeNode(nameFile), 0);
+                }
+                model.reload(nod);
+                pathGlobal = pathTemporal;
+            }
+        }
+    }
+
+    public void deleteFile(String pathToDelete) {
+        pathTemporal = obtenerNuevoPathConRoot(pathToDelete);
+
+        if (findText(pathTemporal)) {
+            nod = (DefaultMutableTreeNode) filesTree.getLastSelectedPathComponent();
+            if (nod.isLeaf()) {
+                if (nod != null) {
+                    DefaultMutableTreeNode parent = (DefaultMutableTreeNode) nod.getParent();
+                    parent.remove(nod);
+                    model.reload(parent);
+                    pathGlobal = eliminarNameDirFile(pathTemporal);
+                }
+            } else {
+                for (int i = 0; i < nod.getChildCount(); i++) {
+                    TreePath aux = (TreePath) nod.getChildAt(i);
+                    deleteFile(aux.getPath().toString().replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "/"));
+                }
+            }
+
+        }
+    }
+
+    public void getNowPath() {
+        consoleTextArea.setText((consoleTextArea.getText() + "\n" + pathGlobal));
+    }
 }

@@ -3,9 +3,11 @@ package simuladorconsola;
 import java_cup.runtime.*;
 
 parser code {:
-	// Connect this parser to a scanner!
+		consola myConsola;
+	// Connect this parser to a scanner
 	public parser(AnalizadorLexico lex) {
 		super(lex);
+		myConsola = new consola();
 	}
 
 	public void syntax_error(Symbol cur_token){
@@ -50,11 +52,11 @@ x ::= x SPACE CONCAT SPACE s0 {: System.out.printf(" && "); :}
 
 /* pwd-> para indicar nuestra ubicacion dentro d las carpetas */
 
-w ::= DIRECTION {: System.out.println("pwd"); :};
+w ::= DIRECTION {: System.out.println("pwd"); myConsola.getNowPath();:};
 
 /* touch-> create a file empty */
 
-t ::= CREATEFE SPACE pf:e {: System.out.println("touch "+ e); :};
+t ::= CREATEFE SPACE pf:e {: System.out.println("touch "+ e); myConsola.addFile(e.toString());:};
 
 /* cd-> navegate into folders */
 
@@ -69,18 +71,18 @@ r1 ::= pf:e {: RESULT = e; :} | nf:e {: RESULT = e; :};
 
 /* rm-> remove a file */
 
-f0 ::= DELETE  SPACE f1:e {: System.out.println("rm "+ e); :};
+f0 ::= DELETE  SPACE f1:e {: System.out.println("rm "+ e); myConsola.deleteFile(e.toString());:};
 
 f1 ::= pf:e {: RESULT = e; :} | nf:e {: RESULT = e; :};
 
 /* rmdir-> remove a directory */
 
-d ::= DELETEDIR SPACE pd:e  {: System.out.println("rmdir "+ e); :}
-	| DELETEDIR SPACE RECURSIVE SPACE pd:e {: System.out.println("rmdir -r "+ e); :};
+d ::= DELETEDIR SPACE pd:e  {: System.out.println("rmdir "+ e); myConsola.deleteFile(e.toString());:}
+	| DELETEDIR SPACE RECURSIVE SPACE pd:e {: System.out.println("rmdir -r "+ e); myConsola.deleteFile(e.toString());:};
 
 /* mkdir-> create a new directory*/
 
-c ::= NEWDIR SPACE pd:e {: System.out.println("mkdir "+ e); :};
+c ::= NEWDIR SPACE pd:e {: System.out.println("mkdir "+ e); myConsola.addFile(e.toString());:};
 
 /* cp-> copy*/
 

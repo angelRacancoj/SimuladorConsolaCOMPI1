@@ -206,9 +206,11 @@ public class parser extends java_cup.runtime.lr_parser {
 
 
 
-	// Connect this parser to a scanner!
+		consola myConsola;
+	// Connect this parser to a scanner
 	public parser(AnalizadorLexico lex) {
 		super(lex);
+		myConsola = new consola();
 	}
 
 	public void syntax_error(Symbol cur_token){
@@ -425,7 +427,7 @@ class CUP$parser$actions {
           case 19: // w ::= DIRECTION 
             {
               Object RESULT =null;
-		 System.out.println("pwd"); 
+		 System.out.println("pwd"); myConsola.getNowPath();
               CUP$parser$result = parser.getSymbolFactory().newSymbol("w",13, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -437,7 +439,7 @@ class CUP$parser$actions {
 		int eleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 System.out.println("touch "+ e); 
+		 System.out.println("touch "+ e); myConsola.addFile(e.toString());
               CUP$parser$result = parser.getSymbolFactory().newSymbol("t",3, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -509,7 +511,7 @@ class CUP$parser$actions {
 		int eleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 System.out.println("rm "+ e); 
+		 System.out.println("rm "+ e); myConsola.deleteFile(e.toString());
               CUP$parser$result = parser.getSymbolFactory().newSymbol("f0",6, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -545,7 +547,7 @@ class CUP$parser$actions {
 		int eleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 System.out.println("rmdir "+ e); 
+		 System.out.println("rmdir "+ e); myConsola.deleteFile(e.toString());
               CUP$parser$result = parser.getSymbolFactory().newSymbol("d",10, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -557,7 +559,7 @@ class CUP$parser$actions {
 		int eleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 System.out.println("rmdir -r "+ e); 
+		 System.out.println("rmdir -r "+ e); myConsola.deleteFile(e.toString());
               CUP$parser$result = parser.getSymbolFactory().newSymbol("d",10, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -569,7 +571,7 @@ class CUP$parser$actions {
 		int eleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 System.out.println("mkdir "+ e); 
+		 System.out.println("mkdir "+ e); myConsola.addFile(e.toString());
               CUP$parser$result = parser.getSymbolFactory().newSymbol("c",5, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
