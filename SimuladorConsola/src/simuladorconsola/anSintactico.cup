@@ -26,7 +26,7 @@ terminal		CONCAT, DIRECTION, RENAMEF, COPY, LIST, LISTDET, LISTHIDE, DELETE, DEL
 /* Non-terminals */
 non terminal			s0, l0, l1, t, n0, c, f0, f1, o0, o1, d, r0, r1, w, h0, h1, h2, h3, pf, pd, nf, p_wrx, x;
 
-precedence left LIST, LISTHIDE, LISTDET;
+precedence left LIST, LISTHIDE, LISTDET, MOVEPATH;
 
 /* The grammar */
 start with x;
@@ -52,16 +52,17 @@ x ::= x SPACE CONCAT SPACE s0 {: System.out.printf(" && "); :}
 
 /* pwd-> para indicar nuestra ubicacion dentro d las carpetas */
 
-w ::= DIRECTION {: System.out.println("pwd"); myConsola.getNowPath();:};
+w ::= DIRECTION {: System.out.println("pwd"); myConsola.getNowPath("pwd");:};
 
 /* touch-> create a file empty */
 
-t ::= CREATEFE SPACE pf:e {: System.out.println("touch "+ e); myConsola.addFile(e.toString());:};
+t ::= CREATEFE SPACE pf:e {: System.out.println("touch "+ e); myConsola.addFile(e.toString()); myConsola.getNowPath("touch "+e);:};
 
 /* cd-> navegate into folders */
 
-n0 ::= MOVEPATH SPACE pd:e {: System.out.println("cd "+ e); :}
-		| MOVEPATH SPACE BACKDIR {: System.out.println("cd .."); :};
+n0 ::= 	MOVEPATH {: System.out.println("cd "); myConsola.getNowPath("cd");:} 
+		| MOVEPATH SPACE pd:e {: System.out.println("cd "+ e); myConsola.getNowPath("cd "+e);:}
+		| MOVEPATH SPACE BACKDIR {: System.out.println("cd .."); myConsola.getNowPath("cd ..");:};
 
 /*mv-> change name a file*/
 
